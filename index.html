@@ -6,171 +6,249 @@
   <title>西语外刊阅读器</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
+
     body {
-      font-family: 'Georgia', serif;
-      background: #f5f0e8;
-      color: #2c2c2c;
-      padding: 40px 20px;
+      font-family: 'Georgia', 'Times New Roman', serif;
+      background: #f7f4ef;
+      color: #1a1a1a;
+      padding: 48px 24px;
+      font-size: 15px;
     }
-    .container { max-width: 780px; margin: 0 auto; }
 
-    header { text-align: center; margin-bottom: 36px; }
-    header h1 { font-size: 2rem; color: #8b1a1a; letter-spacing: 2px; }
-    header p  { color: #888; font-size: 0.9rem; margin-top: 6px; }
+    .container { max-width: 720px; margin: 0 auto; }
 
+    /* ── 顶部刊头 ── */
+    header {
+      text-align: center;
+      margin-bottom: 48px;
+      padding-bottom: 20px;
+      border-bottom: 2px solid #1a1a1a;
+    }
+    header h1 {
+      font-size: 2rem;
+      font-weight: 900;
+      letter-spacing: 6px;
+      text-transform: uppercase;
+      color: #1a1a1a;
+    }
+    header p {
+      font-size: 0.72rem;
+      color: #888;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      margin-top: 6px;
+    }
+
+    /* ── 文章卡片列表 ── */
     #article-list { display: block; }
     .article-card-link {
       display: block;
-      background: #fff;
-      border-radius: 12px;
-      padding: 22px 28px;
-      margin-bottom: 16px;
-      box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+      padding: 24px 0;
+      border-bottom: 1px solid #ddd;
       cursor: pointer;
-      transition: box-shadow 0.2s, transform 0.2s;
+      transition: opacity 0.2s;
     }
-    .article-card-link:hover {
-      box-shadow: 0 6px 24px rgba(0,0,0,0.13);
-      transform: translateY(-2px);
+    .article-card-link:hover { opacity: 0.6; }
+    .card-title {
+      font-size: 1.15rem;
+      font-weight: bold;
+      color: #1a1a1a;
+      margin-bottom: 6px;
+      line-height: 1.4;
     }
-    .card-title { font-size: 1.15rem; font-weight: bold; color: #1a1a2e; margin-bottom: 6px; }
-    .card-meta  { font-size: 0.8rem; color: #aaa; }
+    .card-meta {
+      font-size: 0.72rem;
+      color: #999;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
 
+    /* ── 阅读视图 ── */
     #reader-view { display: none; }
+
     .back-btn {
       display: inline-flex;
       align-items: center;
       gap: 6px;
       background: none;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      padding: 6px 14px;
-      font-size: 0.88rem;
+      border: none;
+      font-size: 0.72rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
       cursor: pointer;
-      color: #555;
-      margin-bottom: 20px;
-      transition: background 0.2s;
+      color: #999;
+      margin-bottom: 36px;
+      padding: 0;
+      transition: color 0.2s;
     }
-    .back-btn:hover { background: #eee; }
+    .back-btn:hover { color: #1a1a1a; }
 
-    /* 白色文章框两边距减小 */
+    /* ── 文章主体 ── */
     .article-box {
       background: #fff;
-      border-radius: 12px;
-      padding: 20px 10px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+      border-radius: 2px;
+      padding: 48px 52px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+    }
+
+    .article-label {
+      font-size: 0.68rem;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: #c0392b;
+      margin-bottom: 12px;
     }
     .article-title {
-      font-size: 1.1rem;
-      font-weight: bold;
-      color: #1a1a2e;
-      margin-bottom: 6px;
+      font-size: 1.6rem;
+      font-weight: 900;
+      color: #1a1a1a;
+      line-height: 1.3;
+      margin-bottom: 10px;
     }
     .article-meta {
-      font-size: 0.78rem;
-      color: #aaa;
-      border-bottom: 1px solid #eee;
-      padding-bottom: 14px;
-      margin-bottom: 24px;
-    }
-
-    .paragraph-block { margin-bottom: 24px; }
-
-    /* 西语段落：点击无变化 */
-    .es-text {
-      font-size: 0.88rem;
-      line-height: 1.85;
-      color: #222;
-      cursor: pointer;
-      padding-left: 4px;
-    }
-
-    /* 中文翻译 */
-    .zh-translation {
-      display: none;
-      margin-top: 8px;
-      padding: 10px 14px;
-      background: #f2f2f2;
-      border-radius: 8px;
-      font-size: 0.82rem;
-      color: #444;
-      line-height: 1.7;
-      border-left: 3px solid #bbb;
-    }
-    .zh-translation.visible { display: block; }
-    .zh-label {
-      font-size: 0.68rem;
-      color: #999;
+      font-size: 0.7rem;
+      color: #bbb;
+      letter-spacing: 2px;
       text-transform: uppercase;
-      letter-spacing: 1px;
-      margin-bottom: 4px;
+      padding-bottom: 24px;
+      margin-bottom: 28px;
+      border-bottom: 1px solid #eee;
     }
 
-    /* 单词列表区域 */
-    .words-block {
-      display: none;
-      margin-top: 8px;
-      padding: 10px 14px;
+    /* ── 引言 ── */
+    .intro-block {
+      margin-bottom: 36px;
+      padding: 20px 24px;
+      border-left: 3px solid #1a1a1a;
       background: #fafafa;
-      border-radius: 8px;
-      border-left: 3px solid #d5c9b0;
     }
-    .words-block.visible { display: block; }
+    .intro-label {
+      font-size: 0.65rem;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: #999;
+      margin-bottom: 10px;
+    }
+    .intro-es {
+      font-size: 0.88rem;
+      line-height: 1.8;
+      color: #333;
+      margin-bottom: 10px;
+      font-style: italic;
+    }
+    .intro-zh {
+      font-size: 0.82rem;
+      line-height: 1.75;
+      color: #777;
+    }
+
+    /* ── 段落 ── */
+    .paragraph-block {
+      margin-bottom: 32px;
+    }
+
+    .es-text {
+      font-size: 0.92rem;
+      line-height: 1.95;
+      color: #1a1a1a;
+      margin-bottom: 14px;
+    }
+
+    /* 关键词：蓝色下划线 */
+    .key-word {
+      color: #2563b0;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+      text-decoration-thickness: 1px;
+    }
+
+    /* ── 中文翻译 ── */
+    .zh-translation {
+      padding: 14px 18px;
+      background: #f4f4f4;
+      border-radius: 2px;
+      font-size: 0.82rem;
+      color: #555;
+      line-height: 1.8;
+      margin-bottom: 14px;
+    }
+    .zh-label {
+      font-size: 0.62rem;
+      color: #bbb;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+
+    /* ── 词汇表 ── */
+    .words-block {
+      border-top: 1px solid #eee;
+      padding-top: 14px;
+    }
+    .words-label {
+      font-size: 0.62rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: #bbb;
+      margin-bottom: 10px;
+    }
     .word-item {
       margin-bottom: 10px;
-      font-size: 0.8rem;
+      font-size: 0.78rem;
       line-height: 1.65;
+      padding-left: 10px;
+      border-left: 2px solid #e0e0e0;
     }
     .word-item:last-child { margin-bottom: 0; }
     .word-term {
       font-weight: bold;
-      color: #8b1a1a;
-      font-size: 0.82rem;
+      color: #2563b0;
     }
-    .word-def  { color: #444; }
-    .word-usage-label {
-      font-size: 0.68rem;
-      color: #999;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-    .word-usage { color: #666; font-size: 0.78rem; }
-
-    .hint-bar {
-      text-align: center;
-      font-size: 0.78rem;
-      color: #bbb;
-      margin-bottom: 20px;
-    }
-    .hint-bar span {
-      background: #eee;
-      border-radius: 4px;
-      padding: 2px 8px;
+    .word-def { color: #444; }
+    .word-usage {
       color: #888;
-      margin: 0 3px;
+      font-size: 0.74rem;
+      display: block;
+      margin-top: 2px;
+    }
+
+    /* ── 段落分隔线 ── */
+    .para-divider {
+      border: none;
+      border-top: 1px solid #f0f0f0;
+      margin: 32px 0;
     }
 
     #empty-tip {
       text-align: center; color: #bbb;
-      font-size: 0.95rem; padding: 60px 0;
+      font-size: 0.9rem; padding: 60px 0;
       display: none;
     }
 
-    /* 打印优化 */
+    /* ── 手机适配 ── */
+    @media (max-width: 600px) {
+      body { padding: 24px 12px; font-size: 15px; }
+      .article-box { padding: 28px 20px; }
+      .article-title { font-size: 1.25rem; }
+      .es-text { font-size: 0.97rem; line-height: 2; }
+      .zh-translation { font-size: 0.88rem; }
+      .word-item { font-size: 0.84rem; }
+    }
+
+    /* ── 打印 ── */
     @media print {
-      body { background: #fff; padding: 0; font-size: 10pt; }
-      .back-btn, .hint-bar, header { display: none; }
+      body { background: #fff; padding: 0; }
+      .back-btn, header { display: none; }
       .article-box { box-shadow: none; padding: 0; }
-      .zh-translation { display: block !important; }
-      .words-block { display: block !important; }
       .paragraph-block { page-break-inside: avoid; }
     }
   </style>
 </head>
 <body>
 <div class="container">
+
   <header>
-    <h1>📰 西语外刊阅读</h1>
+    <h1>Lectura</h1>
     <p>公众号【西语SuperO】</p>
   </header>
 
@@ -180,16 +258,15 @@
   </div>
 
   <div id="reader-view">
-    <button class="back-btn" id="back-btn">← 返回文章列表</button>
-    <div class="hint-bar">
-      <span>点击段落</span> 展开／收起中文翻译与词汇
-    </div>
+    <button class="back-btn" id="back-btn">← Volver</button>
     <div class="article-box">
+      <div class="article-label">El País · Análisis</div>
       <div class="article-title" id="reader-title"></div>
       <div class="article-meta"  id="reader-meta"></div>
       <div id="reader-body"></div>
     </div>
   </div>
+
 </div>
 
 <script>
@@ -200,12 +277,10 @@ async function init() {
     const res = await fetch(INDEX_FILE);
     if (!res.ok) throw new Error();
     const fileList = await res.json();
-
     if (!fileList.length) {
       document.getElementById("empty-tip").style.display = "block";
       return;
     }
-
     const container = document.getElementById("cards-container");
     for (const filePath of fileList) {
       try {
@@ -216,13 +291,11 @@ async function init() {
         card.className = "article-card-link";
         card.innerHTML = `
           <div class="card-title">${data.title}</div>
-          <div class="card-meta">${data.source} · ${data.date} · ${data.paragraphs.length} 段落</div>
+          <div class="card-meta">${data.source} &nbsp;·&nbsp; ${data.date}</div>
         `;
         card.addEventListener("click", () => openArticle(data));
         container.appendChild(card);
-      } catch {
-        console.warn("无法加载文章：", filePath);
-      }
+      } catch { console.warn("无法加载：", filePath); }
     }
   } catch {
     document.getElementById("empty-tip").style.display = "block";
@@ -238,29 +311,91 @@ function openArticle(data) {
   const body = document.getElementById("reader-body");
   body.innerHTML = "";
 
-  // 引言块
+  // 引言
   if (data.intro) {
     const introDiv = document.createElement("div");
-    introDiv.style.cssText = `
-      background: #fff8ec;
-      border-left: 4px solid #f39c12;
-      border-radius: 8px;
-      padding: 12px 16px;
-      margin-bottom: 24px;
-      font-size: 0.85rem;
-      line-height: 1.8;
-      color: #555;
-    `;
+    introDiv.className = "intro-block";
     introDiv.innerHTML = `
-      <div style="font-size:0.68rem;color:#f39c12;letter-spacing:1px;margin-bottom:6px;">📌 引言 INTRODUCCIÓN</div>
-      <div style="margin-bottom:8px;">${data.intro.es}</div>
-      <div style="color:#888;font-size:0.82rem;">${data.intro.zh}</div>
+      <div class="intro-label">Introducción · 引言</div>
+      <div class="intro-es">${data.intro.es}</div>
+      <div class="intro-zh">${data.intro.zh}</div>
     `;
     body.appendChild(introDiv);
   }
 
-  renderArticle(data);
+  // 段落
+  data.paragraphs.forEach((para, idx) => {
+    const block = document.createElement("div");
+    block.className = "paragraph-block";
+
+    // 西语正文：关键词标蓝
+    const esDiv = document.createElement("p");
+    esDiv.className = "es-text";
+    esDiv.innerHTML = highlightKeywords(para.es, para.words);
+
+    // 中文翻译（始终显示）
+    const zhDiv = document.createElement("div");
+    zhDiv.className = "zh-translation";
+    zhDiv.innerHTML = `<div class="zh-label">译文</div>${para.zh}`;
+
+    // 词汇表（始终显示）
+    const wordsDiv = document.createElement("div");
+    if (para.words && Object.keys(para.words).length > 0) {
+      wordsDiv.className = "words-block";
+      wordsDiv.innerHTML = `<div class="words-label">词汇 Vocabulario</div>`;
+      Object.entries(para.words).forEach(([term, info]) => {
+        const item = document.createElement("div");
+        item.className = "word-item";
+        item.innerHTML = `
+          <span class="word-term">${term}</span>
+          <span class="word-def"> — ${info.def}</span>
+          <span class="word-usage">${info.usage}</span>
+        `;
+        wordsDiv.appendChild(item);
+      });
+    }
+
+    block.appendChild(esDiv);
+    block.appendChild(zhDiv);
+    if (para.words && Object.keys(para.words).length > 0) {
+      block.appendChild(wordsDiv);
+    }
+
+    // 段落间分隔线（最后一段不加）
+    if (idx < data.paragraphs.length - 1) {
+      const hr = document.createElement("hr");
+      hr.className = "para-divider";
+      block.appendChild(hr);
+    }
+
+    body.appendChild(block);
+  });
+
   window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+// 关键词标蓝：匹配 words 里的词，整词匹配，不区分大小写
+function highlightKeywords(text, words) {
+  if (!words) return escapeHtml(text);
+  // 按词长降序排列，避免短词覆盖长词
+  const terms = Object.keys(words).sort((a, b) => b.length - a.length);
+  // 先转义 HTML
+  let result = escapeHtml(text);
+  terms.forEach(term => {
+    // 支持多词短语和单词，整词匹配
+    const escaped = term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const regex = new RegExp(`(?<![\\w\\u00C0-\\u024F])(${escaped})(?![\\w\\u00C0-\\u024F])`, 'gi');
+    result = result.replace(regex, `<span class="key-word">$1</span>`);
+  });
+  return result;
+}
+
+function escapeHtml(str) {
+  return str
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
 }
 
 document.getElementById("back-btn").addEventListener("click", () => {
@@ -268,62 +403,6 @@ document.getElementById("back-btn").addEventListener("click", () => {
   document.getElementById("article-list").style.display = "block";
   document.getElementById("reader-body").innerHTML = "";
 });
-
-function renderArticle(data) {
-  const body = document.getElementById("reader-body");
-
-  data.paragraphs.forEach((para) => {
-    const block = document.createElement("div");
-    block.className = "paragraph-block";
-
-    // 西语段落（纯文本，无交互样式变化）
-    const esDiv = document.createElement("p");
-    esDiv.className = "es-text";
-    esDiv.textContent = para.es;
-
-    // 中文翻译
-    const zhDiv = document.createElement("div");
-    zhDiv.className = "zh-translation";
-    zhDiv.innerHTML = `<div class="zh-label">中文翻译</div>${para.zh}`;
-
-    // 单词块
-    const wordsDiv = document.createElement("div");
-    wordsDiv.className = "words-block";
-
-    if (para.words && Object.keys(para.words).length > 0) {
-      Object.entries(para.words).forEach(([term, info]) => {
-        const item = document.createElement("div");
-        item.className = "word-item";
-        item.innerHTML = `
-          <span class="word-term">${term}</span>
-          <span class="word-def"> — ${info.def}</span><br/>
-          <span class="word-usage-label">用法：</span>
-          <span class="word-usage">${info.usage}</span>
-        `;
-        wordsDiv.appendChild(item);
-      });
-    }
-
-    // 点击段落切换展开／收起
-    esDiv.addEventListener("click", () => {
-      const isOpen = zhDiv.classList.contains("visible");
-      if (isOpen) {
-        zhDiv.classList.remove("visible");
-        wordsDiv.classList.remove("visible");
-      } else {
-        zhDiv.classList.add("visible");
-        if (para.words && Object.keys(para.words).length > 0) {
-          wordsDiv.classList.add("visible");
-        }
-      }
-    });
-
-    block.appendChild(esDiv);
-    block.appendChild(zhDiv);
-    block.appendChild(wordsDiv);
-    body.appendChild(block);
-  });
-}
 
 init();
 </script>
