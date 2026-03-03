@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>西语外刊阅读器</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Georgia', serif;
+      background: #f5f0e8;
+      color: #2c2c2c;
+      padding: 40px 20px;
+    }
+    .container { max-width: 780px; margin: 0 auto; }
+
+    header { text-align: center; margin-bottom: 36px; }
+    header h1 { font-size: 2rem; color: #8b1a1a; letter-spacing: 2px; }
+    header p  { color: #888; font-size: 0.9rem; margin-top: 6px; }
+
+    #article-list { display: block; }
+    .article-card-link {
+      display: block;
+      background: #fff;
+      border-radius: 12px;
+      padding: 22px 28px;
+      margin-bottom: 16px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+      cursor: pointer;
+      transition: box-shadow 0.2s, transform 0.2s;
+    }
+    .article-card-link:hover {
+      box-shadow: 0 6px 24px rgba(0,0,0,0.13);
+      transform: translateY(-2px);
+    }
+    .card-title { font-size: 1.15rem; font-weight: bold; color: #1a1a2e; margin-bottom: 6px; }
+    .card-meta  { font-size: 0.8rem; color: #aaa; }
+
+    #reader-view { display: none; }
+    .back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: none;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      padding: 6px 14px;
+      font-size: 0.88rem;
+      cursor: pointer;
+      color: #555;
+      margin-bottom: 20px;
+      transition: background 0.2s;
+    }
+    .back-btn:hover { background: #eee; }
+
+    /* 白色文章框两边距减小 */
+    .article-box {
+      background: #fff;
+      border-radius: 12px;
+      padding: 20px 10px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    }
+    .article-title {
+      font-size: 1.1rem;
+      font-weight: bold;
+      color: #1a1a2e;
+      margin-bottom: 6px;
+    }
+    .article-meta {
+      font-size: 0.78rem;
+      color: #aaa;
+      border-bottom: 1px solid #eee;
+      padding-bottom: 14px;
+      margin-bottom: 24px;
+    }
+
+    .paragraph-block { margin-bottom: 24px; }
+
+    /* 西语段落：点击无变化 */
+    .es-text {
+      font-size: 0.88rem;
+      line-height: 1.85;
+      color: #222;
+      cursor: pointer;
+      padding-left: 4px;
+    }
+
+    /* 中文翻译 */
+    .zh-translation {
+      display: none;
+      margin-top: 8px;
+      padding: 10px 14px;
+      background: #f2f2f2;
+      border-radius: 8px;
+      font-size: 0.82rem;
+      color: #444;
+      line-height: 1.7;
+      border-left: 3px solid #bbb;
+    }
+    .zh-translation.visible { display: block; }
+    .zh-label {
+      font-size: 0.68rem;
+      color: #999;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 4px;
+    }
+
+    /* 单词列表区域 */
+    .words-block {
+      display: none;
+      margin-top: 8px;
+      padding: 10px 14px;
+      background: #fafafa;
+      border-radius: 8px;
+      border-left: 3px solid #d5c9b0;
+    }
+    .words-block.visible { display: block; }
+    .word-item {
+      margin-bottom: 10px;
+      font-size: 0.8rem;
+      line-height: 1.65;
+    }
+    .word-item:last-child { margin-bottom: 0; }
+    .word-term {
+      font-weight: bold;
+      color: #8b1a1a;
+      font-size: 0.82rem;
+    }
+    .word-def  { color: #444; }
+    .word-usage-label {
+      font-size: 0.68rem;
+      color: #999;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .word-usage { color: #666; font-size: 0.78rem; }
+
+    .hint-bar {
+      text-align: center;
+      font-size: 0.78rem;
+      color: #bbb;
+      margin-bottom: 20px;
+    }
+    .hint-bar span {
+      background: #eee;
+      border-radius: 4px;
+      padding: 2px 8px;
+      color: #888;
+      margin: 0 3px;
+    }
+
+    #empty-tip {
+      text-align: center; color: #bbb;
+      font-size: 0.95rem; padding: 60px 0;
+      display: none;
+    }
+
+    /* 打印优化 */
+    @media print {
+      body { background: #fff; padding: 0; font-size: 10pt; }
+      .back-btn, .hint-bar, header { display: none; }
+      .article-box { box-shadow: none; padding: 0; }
+      .zh-translation { display: block !important; }
+      .words-block { display: block !important; }
+      .paragraph-block { page-break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>📰 西语外刊阅读</h1>
+    <p>公众号【西语SuperO】</p>
+  </header>
+
+  <div id="article-list">
+    <div id="cards-container"></div>
+    <div id="empty-tip">暂无文章，请添加 articles/index.json 📂</div>
+  </div>
+
+  <div id="reader-view">
+    <button class="back-btn" id="back-btn">← 返回文章列表</button>
+    <div class="hint-bar">
+      <span>点击段落</span> 展开／收起中文翻译与词汇
+    </div>
+    <div class="article-box">
+      <div class="article-title" id="reader-title"></div>
+      <div class="article-meta"  id="reader-meta"></div>
+      <div id="reader-body"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const INDEX_FILE = "articles/index.json";
+
+async function init() {
+  try {
+    const res = await fetch(INDEX_FILE);
+    if (!res.ok) throw new Error();
+    const fileList = await res.json();
+
+    if (!fileList.length) {
+      document.getElementById("empty-tip").style.display = "block";
+      return;
+    }
+
+    const container = document.getElementById("cards-container");
+    for (const filePath of fileList) {
+      try {
+        const r = await fetch(filePath);
+        if (!r.ok) throw new Error();
+        const data = await r.json();
+        const card = document.createElement("div");
+        card.className = "article-card-link";
+        card.innerHTML = `
+          <div class="card-title">${data.title}</div>
+          <div class="card-meta">${data.source} · ${data.date} · ${data.paragraphs.length} 段落</div>
+        `;
+        card.addEventListener("click", () => openArticle(data));
+        container.appendChild(card);
+      } catch {
+        console.warn("无法加载文章：", filePath);
+      }
+    }
+  } catch {
+    document.getElementById("empty-tip").style.display = "block";
+  }
+}
+
+function openArticle(data) {
+  document.getElementById("article-list").style.display = "none";
+  document.getElementById("reader-view").style.display  = "block";
+  document.getElementById("reader-title").textContent   = data.title;
+  document.getElementById("reader-meta").textContent    = `${data.source} · ${data.date}`;
+
+  const body = document.getElementById("reader-body");
+  body.innerHTML = "";
+
+  // 引言块
+  if (data.intro) {
+    const introDiv = document.createElement("div");
+    introDiv.style.cssText = `
+      background: #fff8ec;
+      border-left: 4px solid #f39c12;
+      border-radius: 8px;
+      padding: 12px 16px;
+      margin-bottom: 24px;
+      font-size: 0.85rem;
+      line-height: 1.8;
+      color: #555;
+    `;
+    introDiv.innerHTML = `
+      <div style="font-size:0.68rem;color:#f39c12;letter-spacing:1px;margin-bottom:6px;">📌 引言 INTRODUCCIÓN</div>
+      <div style="margin-bottom:8px;">${data.intro.es}</div>
+      <div style="color:#888;font-size:0.82rem;">${data.intro.zh}</div>
+    `;
+    body.appendChild(introDiv);
+  }
+
+  renderArticle(data);
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+document.getElementById("back-btn").addEventListener("click", () => {
+  document.getElementById("reader-view").style.display  = "none";
+  document.getElementById("article-list").style.display = "block";
+  document.getElementById("reader-body").innerHTML = "";
+});
+
+function renderArticle(data) {
+  const body = document.getElementById("reader-body");
+
+  data.paragraphs.forEach((para) => {
+    const block = document.createElement("div");
+    block.className = "paragraph-block";
+
+    // 西语段落（纯文本，无交互样式变化）
+    const esDiv = document.createElement("p");
+    esDiv.className = "es-text";
+    esDiv.textContent = para.es;
+
+    // 中文翻译
+    const zhDiv = document.createElement("div");
+    zhDiv.className = "zh-translation";
+    zhDiv.innerHTML = `<div class="zh-label">中文翻译</div>${para.zh}`;
+
+    // 单词块
+    const wordsDiv = document.createElement("div");
+    wordsDiv.className = "words-block";
+
+    if (para.words && Object.keys(para.words).length > 0) {
+      Object.entries(para.words).forEach(([term, info]) => {
+        const item = document.createElement("div");
+        item.className = "word-item";
+        item.innerHTML = `
+          <span class="word-term">${term}</span>
+          <span class="word-def"> — ${info.def}</span><br/>
+          <span class="word-usage-label">用法：</span>
+          <span class="word-usage">${info.usage}</span>
+        `;
+        wordsDiv.appendChild(item);
+      });
+    }
+
+    // 点击段落切换展开／收起
+    esDiv.addEventListener("click", () => {
+      const isOpen = zhDiv.classList.contains("visible");
+      if (isOpen) {
+        zhDiv.classList.remove("visible");
+        wordsDiv.classList.remove("visible");
+      } else {
+        zhDiv.classList.add("visible");
+        if (para.words && Object.keys(para.words).length > 0) {
+          wordsDiv.classList.add("visible");
+        }
+      }
+    });
+
+    block.appendChild(esDiv);
+    block.appendChild(zhDiv);
+    block.appendChild(wordsDiv);
+    body.appendChild(block);
+  });
+}
+
+init();
+</script>
+</body>
+</html>
